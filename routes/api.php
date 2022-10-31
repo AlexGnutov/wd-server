@@ -1,8 +1,11 @@
 <?php
 
-use App\Models\Ticket;
-use Illuminate\Http\Request;
+use App\Http\Controllers\ApiTokenController;
+use App\Http\Controllers\HallController;
+use App\Http\Controllers\SeanceController;
+use App\Http\Controllers\TicketController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\FilmController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,27 +19,27 @@ use Illuminate\Support\Facades\Route;
 */
 
 // ** Public routes ** //
-Route::get('films', [\App\Http\Controllers\FilmController::class, 'index']);
-Route::get('halls', [\App\Http\Controllers\HallController::class, 'index']);
-Route::get('seances', [\App\Http\Controllers\SeanceController::class, 'index']);
-Route::get('tickets/{seance}/{date}', [\App\Http\Controllers\TicketController::class, 'show']);
-Route::post('tickets', [\App\Http\Controllers\TicketController::class, 'store']);
+Route::get('films', [FilmController::class, 'index']);
+Route::get('halls', [HallController::class, 'index']);
+Route::get('seances', [SeanceController::class, 'index']);
+Route::get('tickets/{seance}/{date}', [TicketController::class, 'show']);
+Route::post('tickets', [TicketController::class, 'store']);
 
 // Admin routes
-Route::post('/token/create', [\App\Http\Controllers\ApiTokenController::class, 'createToken']);
+Route::post('/token/create', [ApiTokenController::class, 'createToken']);
 
 Route::group(['middleware' => 'auth:sanctum'], function() {
-    Route::post('/token/clear', [\App\Http\Controllers\ApiTokenController::class, 'clearToken']);
+    Route::post('/token/clear', [ApiTokenController::class, 'clearToken']);
 
-    Route::post('films', [\App\Http\Controllers\FilmController::class, 'store']);
-    Route::delete('films/{id}', [\App\Http\Controllers\FilmController::class, 'destroy']);
+    Route::post('films', [FilmController::class, 'store']);
+    Route::delete('films/{id}', [FilmController::class, 'destroy']);
 
-    Route::post('halls', [\App\Http\Controllers\HallController::class, 'store']);
-    Route::put('halls/{id}', [\App\Http\Controllers\HallController::class, 'update']);
-    Route::delete('halls/{id}', [\App\Http\Controllers\HallController::class, 'destroy']);
+    Route::post('halls', [HallController::class, 'store']);
+    Route::put('halls/{id}', [HallController::class, 'update']);
+    Route::delete('halls/{id}', [HallController::class, 'destroy']);
 
-    Route::post('seances', [\App\Http\Controllers\SeanceController::class, 'store']);
-    Route::delete('seances', [\App\Http\Controllers\SeanceController::class, 'destroy']);
+    Route::post('seances', [SeanceController::class, 'store']);
+    Route::delete('seances', [SeanceController::class, 'destroy']);
 });
 
 

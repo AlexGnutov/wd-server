@@ -2,12 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Film;
+use App\Http\Requests\FilmCreateRequest;
+use App\Interfaces\FilmRepositoryInterface;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class FilmController extends Controller
 {
+    private FilmRepositoryInterface $filmRepository;
+
+    public function __construct(FilmRepositoryInterface $filmRepository)
+    {
+        $this->filmRepository = $filmRepository;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -16,45 +23,25 @@ class FilmController extends Controller
     public function index(): JsonResponse
     {
         try {
-            $films = Film::all();
             return response()->json([
                 'status' => 'ok',
-                'data' => $films,
+                'data' => $this->filmRepository->getAllFilms(),
             ]);
         } catch (\Exception $e) {
             error_log($e->getMessage());
-
             return response()->json([
                 'status' => 'error',
             ], 500);
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return JsonResponse
-     */
-    public function create(): JsonResponse
+    public function store(FilmCreateRequest $request): JsonResponse
     {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function store(Request $request): JsonResponse
-    {
-        $all = $request->all();
-        //TODO: make validation
+        $filmData = $request->all();
         try {
-            $newFilm = Film::create($all);
             return response()->json([
                 'status' => 'ok',
-                'data' => $newFilm,
+                'data' => $this->filmRepository->createFilm($filmData),
             ]);
         } catch (\Exception $e) {
             error_log($e->getMessage());
@@ -62,40 +49,6 @@ class FilmController extends Controller
                 'status' => 'error',
             ], 500);
         }
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Film  $film
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Film $film)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Film  $film
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Film $film)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param Request $request
-     * @param  \App\Models\Film  $film
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Film $film)
-    {
-        //
     }
 
     /**
@@ -107,7 +60,7 @@ class FilmController extends Controller
     public function destroy($id): JsonResponse
     {
         try {
-            Film::destroy([$id]);
+            $this->filmRepository->deleteFilm([$id]);
             return response()->json([
                 'status' => 'ok',
             ]);

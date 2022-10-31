@@ -2,13 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Hall;
-use http\Env\Response;
+use App\Http\Requests\HallUpdateRequest;
+use App\Interfaces\HallRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class HallController extends Controller
 {
+    private HallRepositoryInterface $hallRepository;
+
+    public function __construct(HallRepositoryInterface $hallRepository)
+    {
+        $this->hallRepository = $hallRepository;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -17,10 +24,9 @@ class HallController extends Controller
     public function index(): JsonResponse
     {
         try {
-            $halls = Hall::all();
             return response()->json([
                 'status' => 'ok',
-                'data' => $halls,
+                'data' => $this->hallRepository->getAllHalls(),
             ]);
         } catch (\Exception $e) {
             error_log($e->getMessage());
@@ -38,13 +44,11 @@ class HallController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $all = $request->all();
-        //TODO: make validation
+        $hallData = $request->all();
         try {
-            $newHall = Hall::create($all);
             return response()->json([
                 'status' => 'ok',
-                'data' => $newHall,
+                'data' => $this->hallRepository->createHall($hallData),
             ]);
         } catch (\Exception $e) {
             error_log($e->getMessage());
@@ -57,41 +61,35 @@ class HallController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
+     * @param HallUpdateRequest $request
      * @param $id
      * @return JsonResponse
      */
-    public function update(Request $request, $id): JsonResponse
+    public function update(HallUpdateRequest $request, $id): JsonResponse
     {
+        $updateHallData = $request->all();
         try {
-            $hall = Hall::findOrFail($id);
-            error_log(gettype($hall));
-            if ($hall) {
-                $hall->fill($request->all());
-                $hall->save();
-                return response()->json([
+            return response()->json([
                     'status' => 'ok',
-                    'data' => $hall,
+                    'data' => $this->hallRepository->updateHall($id, $updateHallData),
                 ], 200);
-            }
         } catch (\Exception $th) {
             return response()->json([
                 'status' => 'error'
             ], 500);
         }
-
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param Hall $hall
+     * @param $id
      * @return JsonResponse
      */
     public function destroy($id): JsonResponse
     {
         try {
-            Hall::destroy([$id]);
+            $this->hallRepository->deleteHall($id);
             return response()->json([
                 'status' => 'ok',
             ]);

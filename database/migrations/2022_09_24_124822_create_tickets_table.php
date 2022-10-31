@@ -17,8 +17,9 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->string('date');
-            $table->integer('seanceId');
             $table->json('seats');
+            $table->unsignedBigInteger('seanceId');
+            $table->foreign('seanceId')->references('id')->on('seances');
         });
     }
 

@@ -13,12 +13,18 @@ return new class extends Migration
      */
     public function up()
     {
+        Schema::enableForeignKeyConstraints();
+
         Schema::create('seances', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
             $table->integer('startTime');
-            $table->integer('hallId');
-            $table->integer('filmId');
+
+            $table->unsignedBigInteger('hallId');
+            $table->foreign('hallId')->references('id')->on('halls');
+
+            $table->unsignedBigInteger('filmId');
+            $table->foreign('filmId')->references('id')->on('films');
         });
     }
 

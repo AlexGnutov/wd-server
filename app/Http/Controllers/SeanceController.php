@@ -2,35 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Film;
-use App\Models\Hall;
-use App\Models\Seance;
+use App\Http\Requests\SeanceCreateRequest;
+use App\Interfaces\SeanceRepositoryInterface;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class SeanceController extends Controller
 {
+    private SeanceRepositoryInterface $seanceRepository;
+
+    public function __construct(SeanceRepositoryInterface $seanceRepository)
+    {
+        $this->seanceRepository = $seanceRepository;
+    }
+
     /**
      * Returns list of Seances populated with FilmData
      *
      * @return JsonResponse
      */
-    public function index()
+    public function index(): JsonResponse
     {
         try {
-            $data = Seance::all()->map(function ($seance) {
-                return [
-                    'id' => $seance->id,
-                    'startTime' => $seance->startTime,
-                    'hallId' => $seance->hallId,
-                    'filmId' => $seance->filmId,
-                    'filmData' => Film::find($seance->filmId),
-                    'hallData' => Hall::find($seance->hallId),
-                ];
-            });
             return response()->json([
                 'status' => 'ok',
-                'data' => $data,
+                'data' => $this->seanceRepository->getAllSeances(),
             ], 200);
         } catch (\Exception $ex) {
             error_log($ex->getMessage());
@@ -44,18 +39,16 @@ class SeanceController extends Controller
     /**
      * Stores a newly created Seance in storage.
      *
-     * @param Request $request
+     * @param SeanceCreateRequest $request
      * @return JsonResponse
      */
-    public function store(Request $request): JsonResponse
+    public function store(SeanceCreateRequest $request): JsonResponse
     {
-        //TODO:add validation
+        $seanceData = $request->all();
         try {
-            error_log(implode(' ', $request->all()));
-            $new = Seance::create($request->all());
             return response()->json([
-               'status' => 'ok',
-               'data' => $new,
+                'status' => 'ok',
+                'data' => $this->seanceRepository->createSeance($seanceData),
             ], 200);
         } catch (\Exception $ex) {
             return response()->json([
@@ -66,36 +59,23 @@ class SeanceController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Seance  $seance
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Seance $seance)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param Request $request
-     * @param  \App\Models\Seance  $seance
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Seance $seance)
-    {
-        //
-    }
-
-    /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Seance  $seance
-     * @return \Illuminate\Http\Response
+     * @param $id
+     * @return JsonResponse
      */
-    public function destroy(Seance $seance)
+    public function destroy($id)
     {
-        //
+        try {
+            $this->seanceRepository->deleteSeance([$id]);
+            return response()->json([
+                'status' => 'ok',
+            ]);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return response()->json([
+                'status' => 'error',
+            ], 500);
+        }
     }
 }
