@@ -56,4 +56,4 @@ Route -> Request -> Controller -> Repository -> Database
 В текущих настройках сидирования данные тестового пользователя-администратора:
 * имя пользователя: test
 * почта: test@test.ru
-* пароль: test
+* пароль: test_test
