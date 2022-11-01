@@ -16,5 +16,6 @@ class Hall extends Model
         'seats',
         'standardPrice',
         'vipPrice',
+        'openedForSales',
     ];
 }

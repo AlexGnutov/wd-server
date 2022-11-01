@@ -4,10 +4,12 @@ namespace App\Providers;
 
 use App\Interfaces\FilmRepositoryInterface;
 use App\Interfaces\HallRepositoryInterface;
+use App\Interfaces\PublicFileRepositoryInterface;
 use App\Interfaces\SeanceRepositoryInterface;
 use App\Interfaces\TicketRepositoryInterface;
 use App\Repositories\FilmRepository;
 use App\Repositories\HallRepository;
+use App\Repositories\PublicFileRepository;
 use App\Repositories\SeanceRepository;
 use App\Repositories\TicketRepository;
 use Illuminate\Support\ServiceProvider;
@@ -25,6 +27,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(HallRepositoryInterface::class, HallRepository::class);
         $this->app->bind(SeanceRepositoryInterface::class, SeanceRepository::class);
         $this->app->bind(TicketRepositoryInterface::class, TicketRepository::class);
+        $this->app->bind(PublicFileRepositoryInterface::class, PublicFileRepository::class);
     }
 
     /**

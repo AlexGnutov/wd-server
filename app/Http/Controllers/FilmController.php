@@ -31,9 +31,12 @@ class FilmController extends Controller
     public function store(FilmCreateRequest $request): JsonResponse
     {
         $filmData = $request->all();
+        if ($request->hasFile('imageFile')) {
+            error_log('has file');
+        }
         return response()->json([
             'status' => 'ok',
-            'data' => $this->filmRepository->createFilm($filmData),
+            'data' => $this->filmRepository->createFilm($filmData, $request->file('imageFile')),
         ], 201);
     }
 

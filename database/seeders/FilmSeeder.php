@@ -21,7 +21,7 @@ class FilmSeeder extends Seeder
             'duration' => 130,
             'origin' => 'CША',
             'imageText' => 'Звёздные войны постер',
-            'imageFilename' => 'poster1.jpg'
+            'imageFileName' => 'poster1.jpg'
         ]);
 
         DB::table('films')->insert([
@@ -30,7 +30,7 @@ class FilmSeeder extends Seeder
             'duration' => 96,
             'origin' => 'Франция',
             'imageText' => 'Альфа постер',
-            'imageFilename' => 'poster2.jpg'
+            'imageFileName' => 'poster2.jpg'
         ]);
 
         DB::table('films')->insert([
@@ -39,7 +39,7 @@ class FilmSeeder extends Seeder
             'duration' => 130,
             'origin' => 'CША',
             'imageText' => 'Звёздные войны постер',
-            'imageFilename' => 'poster1.jpg'
+            'imageFileName' => 'poster1.jpg'
         ]);
     }
 }

@@ -31,7 +31,7 @@ class FilmCreateRequest extends FormRequest
             'duration' => ['integer', 'required'],
             'origin' => ['string', 'required'],
             'imageText' => ['string', 'required'],
-            'imageFilename' => ['string', 'imageFilename'],
+            'imageFile' => ['file', 'required'],
         ];
     }
 

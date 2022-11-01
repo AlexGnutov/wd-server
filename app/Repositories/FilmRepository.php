@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Exceptions\CustomDatabaseException;
 use App\Interfaces\FilmRepositoryInterface;
+use App\Interfaces\PublicFileRepositoryInterface;
 use App\Interfaces\SeanceRepositoryInterface;
 use App\Interfaces\TicketRepositoryInterface;
 use App\Models\Film;
@@ -14,13 +15,16 @@ class FilmRepository implements FilmRepositoryInterface {
 
     private SeanceRepositoryInterface $seanceRepository;
     private TicketRepositoryInterface $ticketRepository;
+    private PublicFileRepositoryInterface $fileRepository;
 
     public function __construct(
         SeanceRepositoryInterface $seanceRepository,
-        TicketRepositoryInterface $ticketRepository
+        TicketRepositoryInterface $ticketRepository,
+        PublicFileRepositoryInterface $fileRepository,
     ) {
         $this->seanceRepository = $seanceRepository;
         $this->ticketRepository = $ticketRepository;
+        $this->fileRepository = $fileRepository;
     }
 
     /**
@@ -38,9 +42,17 @@ class FilmRepository implements FilmRepositoryInterface {
     /**
      * @throws CustomDatabaseException
      */
-    public function createFilm($filmData)
+    public function createFilm($filmData, $imageFile)
     {
         try {
+            $path = $this->fileRepository->saveFile($imageFile);
+            error_log($path);
+            error_log(implode('',$filmData));
+
+            $filmData['imageFileName'] = $path;
+
+            error_log(implode('',$filmData));
+
             return Film::create($filmData);
         } catch (\Exception $exception) {
             throw new CustomDatabaseException($exception->getMessage());

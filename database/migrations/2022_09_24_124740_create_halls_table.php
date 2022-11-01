@@ -29,6 +29,7 @@ return new class extends Migration
             ));
             $table->integer('standardPrice')->default(100);
             $table->integer('vipPrice')->default(100);
+            $table->boolean('openedForSales')->default(false);
         });
     }
 
