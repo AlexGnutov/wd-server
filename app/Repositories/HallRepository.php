@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Exceptions\CustomDatabaseException;
 use App\Interfaces\HallRepositoryInterface;
 use App\Interfaces\SeanceRepositoryInterface;
 use App\Interfaces\TicketRepositoryInterface;
@@ -9,7 +10,8 @@ use App\Models\Hall;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
-class HallRepository implements HallRepositoryInterface {
+class HallRepository implements HallRepositoryInterface
+{
 
     private SeanceRepositoryInterface $seanceRepository;
     private TicketRepositoryInterface $ticketRepository;
@@ -17,33 +19,60 @@ class HallRepository implements HallRepositoryInterface {
     public function __construct(
         SeanceRepositoryInterface $seanceRepository,
         TicketRepositoryInterface $ticketRepository
-    ) {
+    )
+    {
         $this->seanceRepository = $seanceRepository;
         $this->ticketRepository = $ticketRepository;
     }
 
+    /**
+     * @throws CustomDatabaseException
+     */
     public function getAllHalls(): Collection
     {
-        return Hall::all();
+        try {
+            return Hall::all();
+        } catch (\Exception $exception) {
+            throw new CustomDatabaseException($exception->getMessage());
+        }
     }
 
+    /**
+     * @throws CustomDatabaseException
+     */
     public function createHall($hallData)
     {
-        return Hall::create($hallData);
+        try {
+            return Hall::create($hallData);
+        } catch (\Exception $exception) {
+            throw new CustomDatabaseException($exception->getMessage());
+        }
     }
 
+    /**
+     * @throws CustomDatabaseException
+     */
     public function updateHall($hallId, $updateHallData)
     {
-        $hall = Hall::findOrFail($hallId);
-        $hall->fill($updateHallData);
-        $hall->save();
-        return $hall;
+        try {
+            $hall = Hall::findOrFail($hallId);
+            $hall->fill($updateHallData);
+            $hall->save();
+            return $hall;
+        } catch (\Exception $exception) {
+            throw new CustomDatabaseException($exception->getMessage());
+        }
+
     }
 
+    /**
+     * @throws CustomDatabaseException
+     */
     public function deleteHall($hallId): int
     {
-        DB::beginTransaction();
         try {
+            DB::beginTransaction();
+
             // Collect seances in to be deleted hall, and get their IDs
             $relatedSeanceIds = $this->seanceRepository->findSeances('hallId', $hallId)
                 ->map(function ($seance) {
@@ -53,7 +82,7 @@ class HallRepository implements HallRepositoryInterface {
             // Collect all tickets related to the seances
             $relatedTicketIds = [];
             foreach ($relatedSeanceIds as $seanceId) {
-                $tickets = $this->ticketRepository->findTickets('seanceId', $seanceId )
+                $tickets = $this->ticketRepository->findTickets('seanceId', $seanceId)
                     ->map(function ($ticket) {
                         return $ticket->id;
                     })->all();
@@ -65,13 +94,12 @@ class HallRepository implements HallRepositoryInterface {
             // Delete seances
             $this->seanceRepository->deleteSeances($relatedSeanceIds);
             // Delete hall
-            Hall::destroy([$hallId]);
+            $result = Hall::destroy([$hallId]);
+            DB::commit();
+            return $result;
         } catch (\Exception $exception) {
-            error_log($exception->getMessage());
             DB::rollBack();
-            return 0;
-        } // TODO: ADD Custom Exception
-        DB::commit();
-        return 1;
+            throw new CustomDatabaseException($exception->getMessage());
+        }
     }
 }

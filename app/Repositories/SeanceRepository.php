@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Exceptions\CustomDatabaseException;
 use App\Interfaces\SeanceRepositoryInterface;
 use App\Interfaces\TicketRepositoryInterface;
 use App\Models\Film;
@@ -18,42 +19,70 @@ class SeanceRepository implements SeanceRepositoryInterface {
         $this->ticketRepository = $ticketRepository;
     }
 
+    /**
+     * @throws CustomDatabaseException
+     */
     public function getAllSeances(): Collection|\Illuminate\Support\Collection
     {
-        return Seance::all()->map(function ($seance) {
-            return [
-                'id' => $seance->id,
-                'startTime' => $seance->startTime,
-                'hallId' => $seance->hallId,
-                'filmId' => $seance->filmId,
-                'filmData' => Film::find($seance->filmId),
-                'hallData' => Hall::find($seance->hallId),
-            ];
-        });
+        try {
+            return Seance::all()->map(function ($seance) {
+                return [
+                    'id' => $seance->id,
+                    'startTime' => $seance->startTime,
+                    'hallId' => $seance->hallId,
+                    'filmId' => $seance->filmId,
+                    'filmData' => Film::find($seance->filmId),
+                    'hallData' => Hall::find($seance->hallId),
+                ];
+            });
+        } catch (\Exception $exception) {
+            throw new CustomDatabaseException($exception->getMessage());
+        }
+
     }
 
+    /**
+     * @throws CustomDatabaseException
+     */
     public function createSeance($seanceData)
     {
-        return Seance::create($seanceData);
+        try {
+            return Seance::create($seanceData);
+        } catch (\Exception $exception) {
+            throw new CustomDatabaseException($exception->getMessage());
+        }
     }
 
+    /**
+     * @throws CustomDatabaseException
+     */
     public function findSeances($key, $value): Collection
     {
-        return Seance::where($key, '=', $value)->get();
+        try {
+            return Seance::where($key, '=', $value)->get();
+        } catch (\Exception $exception) {
+            throw new CustomDatabaseException($exception->getMessage());
+        }
     }
 
     /**
      * Deletes seances only
      * @param array $seanceIds
      * @return int
+     * @throws CustomDatabaseException
      */
     public function deleteSeances(array $seanceIds): int
     {
-        return Seance::destroy($seanceIds);
+        try {
+            return Seance::destroy($seanceIds);
+        } catch (\Exception $exception) {
+            throw new CustomDatabaseException($exception->getMessage());
+        }
     }
 
     /**
      * Deletes a seance with related tickets
+     * @throws CustomDatabaseException
      */
     public function deleteSeance($seanceId)
     {
@@ -69,14 +98,12 @@ class SeanceRepository implements SeanceRepositoryInterface {
             // Delete tickets
             $this->ticketRepository->deleteTickets($relatedTicketIds);
             // Delete seance
-            Seance::destroy($seanceId);
-
+            $result = Seance::destroy($seanceId);
+            DB::commit();
+            return $result;
         } catch (\Exception $exception) {
-            error_log($exception->getMessage());
             DB::rollBack();
-            return 0;
-        } //TODO:: Add custom Exception
-        DB::commit();
-        return 1;
+            throw new CustomDatabaseException($exception->getMessage());
+        }
     }
 }

@@ -22,18 +22,10 @@ class SeanceController extends Controller
      */
     public function index(): JsonResponse
     {
-        try {
-            return response()->json([
-                'status' => 'ok',
-                'data' => $this->seanceRepository->getAllSeances(),
-            ], 200);
-        } catch (\Exception $ex) {
-            error_log($ex->getMessage());
-            return response()->json([
-                'status' => 'error',
-                'data' => "DB Error: can't load seances",
-            ], 500);
-        }
+        return response()->json([
+            'status' => 'ok',
+            'data' => $this->seanceRepository->getAllSeances(),
+        ], 200);
     }
 
     /**
@@ -45,17 +37,10 @@ class SeanceController extends Controller
     public function store(SeanceCreateRequest $request): JsonResponse
     {
         $seanceData = $request->all();
-        try {
-            return response()->json([
-                'status' => 'ok',
-                'data' => $this->seanceRepository->createSeance($seanceData),
-            ], 200);
-        } catch (\Exception $ex) {
-            return response()->json([
-                'status' => 'error',
-                'data' => "DB error: can't create seance",
-            ], 500);
-        }
+        return response()->json([
+            'status' => 'ok',
+            'data' => $this->seanceRepository->createSeance($seanceData),
+        ], 200);
     }
 
     /**
@@ -66,16 +51,9 @@ class SeanceController extends Controller
      */
     public function destroy($id)
     {
-        try {
-            $this->seanceRepository->deleteSeance([$id]);
-            return response()->json([
-                'status' => 'ok',
-            ]);
-        } catch (\Exception $e) {
-            error_log($e->getMessage());
-            return response()->json([
-                'status' => 'error',
-            ], 500);
-        }
+        $this->seanceRepository->deleteSeance([$id]);
+        return response()->json([
+            'status' => 'ok',
+        ]);
     }
 }

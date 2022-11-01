@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Exceptions\CustomDatabaseException;
 use App\Interfaces\FilmRepositoryInterface;
 use App\Interfaces\SeanceRepositoryInterface;
 use App\Interfaces\TicketRepositoryInterface;
@@ -22,20 +23,38 @@ class FilmRepository implements FilmRepositoryInterface {
         $this->ticketRepository = $ticketRepository;
     }
 
+    /**
+     * @throws CustomDatabaseException
+     */
     public function getAllFilms(): Collection
     {
-        return Film::all();
+        try {
+            return Film::all();
+        } catch (\Exception $exception) {
+            throw new CustomDatabaseException($exception->getMessage());
+        }
     }
 
+    /**
+     * @throws CustomDatabaseException
+     */
     public function createFilm($filmData)
     {
-        return Film::create($filmData);
+        try {
+            return Film::create($filmData);
+        } catch (\Exception $exception) {
+            throw new CustomDatabaseException($exception->getMessage());
+        }
     }
 
+    /**
+     * @throws CustomDatabaseException
+     */
     public function deleteFilm($filmId): int
     {
-        DB::beginTransaction();
         try {
+            DB::beginTransaction();
+
             // Collect all seances related to the film, and get their IDs
             $relatedSeanceIds = $this->seanceRepository->findSeances('filmId', $filmId)
                 ->map(function ($seance) {
@@ -56,14 +75,14 @@ class FilmRepository implements FilmRepositoryInterface {
             $this->ticketRepository->deleteTickets($relatedTicketIds);
             // Delete seances
             $this->seanceRepository->deleteSeances($relatedSeanceIds);
+
             // Delete film
-            Film::destroy([$filmId]);
+            $result = Film::destroy([$filmId]);
+            DB::commit();
+            return $result;
         } catch (\Exception $exception) {
-            error_log($exception->getMessage());
             DB::rollBack();
-            return 0;
-        } // TODO: ADD Custom Exception
-        DB::commit();
-        return 1;
+            throw new CustomDatabaseException($exception->getMessage());
+        }
     }
 }

@@ -22,33 +22,19 @@ class FilmController extends Controller
      */
     public function index(): JsonResponse
     {
-        try {
-            return response()->json([
-                'status' => 'ok',
-                'data' => $this->filmRepository->getAllFilms(),
-            ]);
-        } catch (\Exception $e) {
-            error_log($e->getMessage());
-            return response()->json([
-                'status' => 'error',
-            ], 500);
-        }
+        return response()->json([
+            'status' => 'ok',
+            'data' => $this->filmRepository->getAllFilms(),
+        ], 200);
     }
 
     public function store(FilmCreateRequest $request): JsonResponse
     {
         $filmData = $request->all();
-        try {
-            return response()->json([
-                'status' => 'ok',
-                'data' => $this->filmRepository->createFilm($filmData),
-            ]);
-        } catch (\Exception $e) {
-            error_log($e->getMessage());
-            return response()->json([
-                'status' => 'error',
-            ], 500);
-        }
+        return response()->json([
+            'status' => 'ok',
+            'data' => $this->filmRepository->createFilm($filmData),
+        ], 201);
     }
 
     /**
@@ -59,16 +45,9 @@ class FilmController extends Controller
      */
     public function destroy($id): JsonResponse
     {
-        try {
-            $this->filmRepository->deleteFilm([$id]);
-            return response()->json([
-                'status' => 'ok',
-            ]);
-        } catch (\Exception $e) {
-            error_log($e->getMessage());
-            return response()->json([
-                'status' => 'error',
-            ], 500);
-        }
+        $this->filmRepository->deleteFilm([$id]);
+        return response()->json([
+            'status' => 'ok',
+        ], 200);
     }
 }
