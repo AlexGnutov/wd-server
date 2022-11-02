@@ -28,6 +28,13 @@ class FilmController extends Controller
         ], 200);
     }
 
+    public function pagination():JsonResponse {
+        return response()->json([
+            'status' => 'ok',
+            'data' => $this->filmRepository->getPaginatedFilms(),
+        ], 200);
+    }
+
     public function store(FilmCreateRequest $request): JsonResponse
     {
         $filmData = $request->all();

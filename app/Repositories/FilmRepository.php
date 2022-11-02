@@ -97,4 +97,16 @@ class FilmRepository implements FilmRepositoryInterface {
             throw new CustomDatabaseException($exception->getMessage());
         }
     }
+
+    /**
+     * @throws CustomDatabaseException
+     */
+    public function getPaginatedFilms()
+    {
+        try {
+            return Film::simplePaginate(1);
+        } catch (\Exception $exception) {
+            throw new CustomDatabaseException($exception->getMessage());
+        }
+    }
 }

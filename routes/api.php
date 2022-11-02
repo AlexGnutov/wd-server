@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Storage;
 
 // ** Public routes ** //
 Route::get('films', [FilmController::class, 'index']);
+Route::get('films/pages', [FilmController::class, 'pagination']);
+
 Route::get('halls', [HallController::class, 'index']);
 Route::get('seances', [SeanceController::class, 'index']);
 Route::get('tickets/{seance}/{date}', [TicketController::class, 'show']);
