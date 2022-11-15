@@ -8,7 +8,8 @@ use App\Interfaces\TicketRepositoryInterface;
 use App\Models\Film;
 use App\Models\Hall;
 use App\Models\Seance;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\{Model};
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class SeanceRepository implements SeanceRepositoryInterface {
@@ -22,7 +23,7 @@ class SeanceRepository implements SeanceRepositoryInterface {
     /**
      * @throws CustomDatabaseException
      */
-    public function getAllSeances(): Collection|\Illuminate\Support\Collection
+    public function getAllSeances(): Collection
     {
         try {
             return Seance::all()->map(function ($seance) {
@@ -44,7 +45,7 @@ class SeanceRepository implements SeanceRepositoryInterface {
     /**
      * @throws CustomDatabaseException
      */
-    public function createSeance($seanceData)
+    public function createSeance(array $seanceData): Model
     {
         try {
             return Seance::create($seanceData);
@@ -84,7 +85,7 @@ class SeanceRepository implements SeanceRepositoryInterface {
      * Deletes a seance with related tickets
      * @throws CustomDatabaseException
      */
-    public function deleteSeance($seanceId)
+    public function deleteSeance(string $seanceId): int
     {
         DB::beginTransaction();
 

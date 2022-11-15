@@ -8,13 +8,14 @@ use App\Models\Film;
 use App\Models\Hall;
 use App\Models\Seance;
 use App\Models\Ticket;
+use Illuminate\Support\Collection;
 
 class TicketRepository implements TicketRepositoryInterface {
 
     /**
      * @throws CustomDatabaseException
      */
-    public function getTickets($ticketDetails)
+    public function getTickets(array $ticketDetails): Collection
     {
         try {
             $date = $ticketDetails['date'];
@@ -29,7 +30,7 @@ class TicketRepository implements TicketRepositoryInterface {
     /**
      * @throws CustomDatabaseException
      */
-    public function createTicket($ticketData)
+    public function createTicket(array $ticketData): array
     {
         try {
             $ticket = Ticket::create([
@@ -57,7 +58,8 @@ class TicketRepository implements TicketRepositoryInterface {
     /**
      * @throws CustomDatabaseException
      */
-    public function findTickets($key, $value) {
+    public function findTickets(string $key, string $value): Collection
+    {
         try {
             return Ticket::where($key, '=', $value)->get();
         } catch (\Exception $exception) {

@@ -51,7 +51,7 @@ class SeanceController extends Controller
      */
     public function destroy($id)
     {
-        $this->seanceRepository->deleteSeance([$id]);
+        $this->seanceRepository->deleteSeance($id);
         return response()->json([
             'status' => 'ok',
         ]);

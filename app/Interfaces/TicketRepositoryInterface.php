@@ -2,9 +2,11 @@
 
 namespace App\Interfaces;
 
+use Illuminate\Support\Collection;
+
 interface TicketRepositoryInterface {
-    public function getTickets($ticketDetails);
-    public function createTicket($ticketData);
-    public function findTickets($key, $value);
+    public function getTickets(array $ticketDetails): Collection;
+    public function createTicket(array $ticketData): array;
+    public function findTickets(string $key, string $value): Collection;
     public function deleteTickets(array $ticketIds): int;
 };

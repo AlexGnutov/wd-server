@@ -7,7 +7,8 @@ use App\Interfaces\HallRepositoryInterface;
 use App\Interfaces\SeanceRepositoryInterface;
 use App\Interfaces\TicketRepositoryInterface;
 use App\Models\Hall;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class HallRepository implements HallRepositoryInterface
@@ -40,7 +41,7 @@ class HallRepository implements HallRepositoryInterface
     /**
      * @throws CustomDatabaseException
      */
-    public function createHall($hallData)
+    public function createHall(array $hallData): Model
     {
         try {
             return Hall::create($hallData);
@@ -52,7 +53,7 @@ class HallRepository implements HallRepositoryInterface
     /**
      * @throws CustomDatabaseException
      */
-    public function updateHall($hallId, $updateHallData)
+    public function updateHall(string $hallId, array $updateHallData): Model
     {
         try {
             $hall = Hall::findOrFail($hallId);
@@ -68,7 +69,7 @@ class HallRepository implements HallRepositoryInterface
     /**
      * @throws CustomDatabaseException
      */
-    public function deleteHall($hallId): int
+    public function deleteHall(string $hallId): int
     {
         try {
             DB::beginTransaction();
@@ -94,7 +95,7 @@ class HallRepository implements HallRepositoryInterface
             // Delete seances
             $this->seanceRepository->deleteSeances($relatedSeanceIds);
             // Delete hall
-            $result = Hall::destroy([$hallId]);
+            $result = Hall::destroy($hallId);
             DB::commit();
             return $result;
         } catch (\Exception $exception) {

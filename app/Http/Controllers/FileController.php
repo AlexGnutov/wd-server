@@ -12,7 +12,7 @@ class FileController extends Controller {
         $this->fileRepository = $fileRepository;
     }
 
-    public function loadFile($fileName)
+    public function loadFile($fileName): ?string
     {
         return $this->fileRepository->loadFile($fileName);
     }

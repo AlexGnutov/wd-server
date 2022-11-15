@@ -8,7 +8,8 @@ use App\Interfaces\PublicFileRepositoryInterface;
 use App\Interfaces\SeanceRepositoryInterface;
 use App\Interfaces\TicketRepositoryInterface;
 use App\Models\Film;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class FilmRepository implements FilmRepositoryInterface {
@@ -42,7 +43,7 @@ class FilmRepository implements FilmRepositoryInterface {
     /**
      * @throws CustomDatabaseException
      */
-    public function createFilm($filmData, $imageFile)
+    public function createFilm($filmData, $imageFile): Model
     {
         try {
             $path = $this->fileRepository->saveFile($imageFile);
@@ -89,23 +90,11 @@ class FilmRepository implements FilmRepositoryInterface {
             $this->seanceRepository->deleteSeances($relatedSeanceIds);
 
             // Delete film
-            $result = Film::destroy([$filmId]);
+            $result = Film::destroy($filmId);
             DB::commit();
             return $result;
         } catch (\Exception $exception) {
             DB::rollBack();
-            throw new CustomDatabaseException($exception->getMessage());
-        }
-    }
-
-    /**
-     * @throws CustomDatabaseException
-     */
-    public function getPaginatedFilms()
-    {
-        try {
-            return Film::simplePaginate(1);
-        } catch (\Exception $exception) {
             throw new CustomDatabaseException($exception->getMessage());
         }
     }

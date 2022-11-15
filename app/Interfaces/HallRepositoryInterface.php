@@ -2,10 +2,13 @@
 
 namespace App\Interfaces;
 
+use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
+
 interface HallRepositoryInterface
 {
-    public function getAllHalls();
-    public function createHall($hallData);
-    public function updateHall($hallId, $updateHallData);
-    public function deleteHall($hallId);
+    public function getAllHalls(): Collection;
+    public function createHall(array $hallData): Model;
+    public function updateHall(string $hallId, array $updateHallData): Model;
+    public function deleteHall(string $hallId): int;
 };
